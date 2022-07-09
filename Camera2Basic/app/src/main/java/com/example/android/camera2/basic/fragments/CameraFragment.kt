@@ -20,14 +20,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Color
 import android.graphics.ImageFormat
-import android.hardware.camera2.CameraCaptureSession
-import android.hardware.camera2.CameraCharacteristics
-import android.hardware.camera2.CameraDevice
-import android.hardware.camera2.CameraManager
-import android.hardware.camera2.CaptureRequest
-import android.hardware.camera2.CaptureResult
-import android.hardware.camera2.DngCreator
-import android.hardware.camera2.TotalCaptureResult
+import android.hardware.camera2.*
 import android.media.Image
 import android.media.ImageReader
 import android.os.Build
@@ -35,11 +28,7 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.HandlerThread
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.Surface
-import android.view.SurfaceHolder
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import androidx.core.graphics.drawable.toDrawable
 import androidx.exifinterface.media.ExifInterface
 import androidx.fragment.app.Fragment
@@ -48,9 +37,9 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
 import androidx.navigation.fragment.navArgs
+import com.example.android.camera.utils.OrientationLiveData
 import com.example.android.camera.utils.computeExifOrientation
 import com.example.android.camera.utils.getPreviewOutputSize
-import com.example.android.camera.utils.OrientationLiveData
 import com.example.android.camera2.basic.CameraActivity
 import com.example.android.camera2.basic.R
 import com.example.android.camera2.basic.databinding.FragmentCameraBinding
@@ -62,11 +51,9 @@ import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
 import java.text.SimpleDateFormat
+import java.util.*
 import java.util.concurrent.ArrayBlockingQueue
 import java.util.concurrent.TimeoutException
-import java.util.Date
-import java.util.Locale
-import kotlin.RuntimeException
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
@@ -213,11 +200,27 @@ class CameraFragment : Fragment() {
         session = createCaptureSession(camera, targets, cameraHandler)
 
         val captureRequest = camera.createCaptureRequest(
-                CameraDevice.TEMPLATE_PREVIEW).apply { addTarget(fragmentCameraBinding.viewFinder.holder.surface) }
+                CameraDevice.TEMPLATE_RECORD).apply { addTarget(fragmentCameraBinding.viewFinder.holder.surface) }
 
         // This will keep sending the capture request as frequently as possible until the
         // session is torn down or session.stopRepeating() is called
         session.setRepeatingRequest(captureRequest.build(), null, cameraHandler)
+
+        fragmentCameraBinding.patternButton.setOnClickListener{
+            val captureRequestBuilder = camera.createCaptureRequest(CameraDevice.TEMPLATE_RECORD);
+
+            if (fragmentCameraBinding.patternButton.isChecked) {
+                captureRequestBuilder.set(CaptureRequest.SENSOR_TEST_PATTERN_MODE,
+                        CaptureRequest.SENSOR_TEST_PATTERN_MODE_SOLID_COLOR);
+                captureRequestBuilder.set(CaptureRequest.SENSOR_TEST_PATTERN_DATA, intArrayOf(0, 0, 0, 0));
+            }
+            captureRequestBuilder.apply { addTarget(fragmentCameraBinding.viewFinder.holder.surface) }
+
+            session.stopRepeating();
+            // This will keep sending the capture request as frequently as possible until the
+            // session is torn down or session.stopRepeating() is called
+            session.setRepeatingRequest(captureRequestBuilder.build(), null, cameraHandler)
+        }
 
         // Listen to the capture button
         fragmentCameraBinding.captureButton.setOnClickListener {

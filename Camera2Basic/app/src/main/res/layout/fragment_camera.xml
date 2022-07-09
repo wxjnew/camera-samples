@@ -34,9 +34,15 @@
         android:id="@+id/capture_button"
         android:layout_width="96dp"
         android:layout_height="96dp"
-        android:layout_gravity="bottom|center"
+        android:layout_gravity="bottom|start"
         android:scaleType="fitCenter"
         android:background="@drawable/ic_shutter"
         android:contentDescription="@string/capture" />
 
+    <CheckBox
+        android:id="@+id/pattern_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="48dp"/>
 </FrameLayout>

@@ -22,8 +22,9 @@ buildscript {
     ext.java_version = JavaVersion.VERSION_1_8
 
     repositories {
-        google()
-        mavenCentral()
+        maven { url 'https://maven.aliyun.com/repository/gradle-plugin' }
+        maven { url 'https://maven.aliyun.com/repository/public' }
+        maven { url 'https://maven.aliyun.com/repository/google' }
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:4.2.2'
@@ -37,8 +38,9 @@ buildscript {
 
 allprojects {
     repositories {
-        google()
-        mavenCentral()
+        maven { url 'https://maven.aliyun.com/repository/gradle-plugin' }
+        maven { url 'https://maven.aliyun.com/repository/public' }
+        maven { url 'https://maven.aliyun.com/repository/google' }
     }
 }
 
